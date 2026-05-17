@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kentakitos | Usuarios</title>
+    
+    <!-- Archivo CSS Principal -->
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <!-- Iconos (Boxicons) -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- BARRA LATERAL (SIDEBAR) -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon">K</div>
+                <h2 class="logo-text">Kentakitos</h2>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/index.html" class="nav-link">
+                        <i class='bx bx-grid-alt'></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/usuarios/index.html" class="nav-link">
+                        <i class='bx bx-user'></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/roles/index.html" class="nav-link">
+                        <i class='bx bx-shield'></i>
+                        <span>Roles</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/permisos/index.html" class="nav-link">
+                        <i class='bx bx-key'></i>
+                        <span>Permisos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/mesas/index.html" class="nav-link">
+                        <i class='bx bx-restaurant'></i>
+                        <span>Mesas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/inventario/index.html" class="nav-link">
+                        <i class='bx bx-box'></i>
+                        <span>Inventario</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/productos/index.html" class="nav-link">
+                        <i class='bx bx-food-menu'></i>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/reportes/index.html" class="nav-link">
+                        <i class='bx bx-bar-chart-alt-2'></i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- CABECERA -->
+            <header class="top-header">
+                <div class="page-title">
+                    <h1>Gestión de Usuarios</h1>
+                    <p>Administra los accesos y credenciales de tu personal.</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="profile-btn" id="btnLogout">
+                        <i class='bx bx-log-out'></i>
+                    </button>
+                </div>
+            </header>
+
+            <section class="table-container">
+                <div class="table-header">
+                    <h2>Lista de Usuarios</h2>
+                    <button class="btn-primary" id="btnNuevoUsuario">
+                        <i class='bx bx-plus'></i> Nuevo Usuario
+                    </button>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre Completo</th>
+                            <th>Username</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUsuariosBody">
+                        <!-- Generado por JS dinámicamente -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL USUARIO -->
+    <div id="usuarioModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modalTitle">Nuevo Usuario</h2>
+            <form id="usuarioForm">
+                <input type="hidden" id="userId">
+                
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="userNombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="userUsername" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="text" id="userPassword" placeholder="Dejar vacío si no quieres cambiarla">
+                </div>
+                
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="userRol" required>
+                        <!-- Cargado desde JS -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="userEstado">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btnCerrarModal">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

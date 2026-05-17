@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kentakitos | Permisos</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon">K</div>
+                <h2 class="logo-text">Kentakitos</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/usuarios/index.html" class="nav-link"><i class='bx bx-user'></i><span>Usuarios</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/roles/index.html" class="nav-link"><i class='bx bx-shield'></i><span>Roles</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/permisos/index.html" class="nav-link"><i class='bx bx-key'></i><span>Permisos</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/mesas/index.html" class="nav-link"><i class='bx bx-restaurant'></i><span>Mesas</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/inventario/index.html" class="nav-link"><i class='bx bx-box'></i><span>Inventario</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/productos/index.html" class="nav-link"><i class='bx bx-food-menu'></i><span>Productos</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/reportes/index.html" class="nav-link"><i class='bx bx-bar-chart-alt-2'></i><span>Reportes</span></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="page-title">
+                    <h1>Gestión de Permisos</h1>
+                    <p>Administra los permisos individuales del sistema.</p>
+                </div>
+            </header>
+
+            <section class="table-container">
+                <div class="table-header">
+                    <h2>Lista de Permisos</h2>
+                    <button class="btn-primary" id="btnNuevoPermiso">
+                        <i class='bx bx-plus'></i> Nuevo Permiso
+                    </button>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Permiso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPermisosBody">
+                        <!-- JS Dinámico -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL PERMISO -->
+    <div id="permisoModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modalTitle">Nuevo Permiso</h2>
+            <form id="permisoForm">
+                <input type="hidden" id="permisoId">
+                <div class="form-group">
+                    <label>Nombre del Permiso (Ej: GESTIONAR_X)</label>
+                    <input type="text" id="permisoNombre" required style="text-transform: uppercase;">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btnCerrarModal">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

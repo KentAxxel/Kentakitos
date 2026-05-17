@@ -1,0 +1,189 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Verificar sesión
+    const usuarioString = localStorage.getItem('usuario');
+    if (!usuarioString) {
+        window.location.href = 'login.html';
+        return;
+    }
+    const usuarioLogueado = JSON.parse(usuarioString);
+    console.log("Sesión iniciada como:", usuarioLogueado.username);
+
+    // Logout
+    const profileBtns = document.querySelectorAll('.profile-btn');
+    if (profileBtns.length >= 2) {
+        profileBtns[1].addEventListener('click', () => {
+            if (confirm("¿Deseas cerrar sesión?")) {
+                localStorage.removeItem('usuario');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+
+    // --- LÓGICA DE USUARIOS (CRUD) ---
+    const tablaBody = document.getElementById('tablaUsuariosBody');
+    const modal = document.getElementById('usuarioModal');
+    const btnNuevoUsuario = document.getElementById('btnNuevoUsuario');
+    const btnCerrarModal = document.getElementById('btnCerrarModal');
+    const form = document.getElementById('usuarioForm');
+    const selectRol = document.getElementById('userRol');
+
+    let usuariosGlobal = [];
+
+    // Cargar Roles para el select
+    async function cargarRoles() {
+        try {
+            const res = await fetch('http://localhost:8080/api/roles');
+            const roles = await res.json();
+            selectRol.innerHTML = '';
+            roles.forEach(rol => {
+                const option = document.createElement('option');
+                option.value = rol.id;
+                option.textContent = rol.nombre;
+                selectRol.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando roles", error);
+        }
+    }
+
+    // Obtener y renderizar usuarios
+    async function cargarUsuarios() {
+        try {
+            const res = await fetch('http://localhost:8080/api/usuarios');
+            usuariosGlobal = await res.json();
+            renderTabla(usuariosGlobal);
+        } catch (error) {
+            console.error("Error cargando usuarios", error);
+            tablaBody.innerHTML = '<tr><td colspan="5">Error de conexión con el servidor</td></tr>';
+        }
+    }
+
+    function renderTabla(usuarios) {
+        tablaBody.innerHTML = '';
+        usuarios.forEach(u => {
+            const tr = document.createElement('tr');
+            
+            const estadoClase = u.activo ? 'status active' : 'status pending';
+            const estadoTexto = u.activo ? 'Activo' : 'Inactivo';
+            
+            tr.innerHTML = `
+                <td>${u.nombreCompleto}</td>
+                <td>@${u.username}</td>
+                <td>${u.rol.nombre}</td>
+                <td><span class="${estadoClase}">${estadoTexto}</span></td>
+                <td>
+                    <button class="action-btn btn-editar" data-id="${u.id}"><i class='bx bx-edit-alt'></i></button>
+                    <button class="action-btn btn-eliminar" data-id="${u.id}"><i class='bx bx-trash'></i></button>
+                </td>
+            `;
+            tablaBody.appendChild(tr);
+        });
+
+        // Eventos a botones dinámicos
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                abrirModal(id);
+            });
+        });
+
+        document.querySelectorAll('.btn-eliminar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                eliminarUsuario(id);
+            });
+        });
+    }
+
+    function abrirModal(id = null) {
+        document.getElementById('modalTitle').innerText = id ? 'Editar Usuario' : 'Nuevo Usuario';
+        
+        if (id) {
+            const u = usuariosGlobal.find(x => x.id === id);
+            document.getElementById('userId').value = u.id;
+            document.getElementById('userNombre').value = u.nombreCompleto;
+            document.getElementById('userUsername').value = u.username;
+            document.getElementById('userUsername').disabled = true; // No permitir cambiar username editando
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userRol').value = u.rol.id;
+            document.getElementById('userEstado').value = u.activo.toString();
+        } else {
+            document.getElementById('userId').value = '';
+            document.getElementById('userNombre').value = '';
+            document.getElementById('userUsername').value = '';
+            document.getElementById('userUsername').disabled = false;
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userEstado').value = 'true';
+        }
+        
+        modal.style.display = 'flex';
+    }
+
+    function cerrarModal() {
+        modal.style.display = 'none';
+        form.reset();
+    }
+
+    // Eliminar Usuario
+    async function eliminarUsuario(id) {
+        if (!confirm('¿Estás seguro de eliminar este usuario permanentemente?')) return;
+        try {
+            const res = await fetch(`http://localhost:8080/api/usuarios/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                cargarUsuarios();
+            } else {
+                alert('No se pudo eliminar');
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // Guardar (Crear o Editar)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('userId').value;
+        const nombre = document.getElementById('userNombre').value;
+        const username = document.getElementById('userUsername').value;
+        const password = document.getElementById('userPassword').value;
+        const rolId = document.getElementById('userRol').value;
+        const activo = document.getElementById('userEstado').value === 'true';
+
+        const payload = {
+            nombreCompleto: nombre,
+            username: username,
+            password: password,
+            activo: activo,
+            rol: { id: parseInt(rolId) }
+        };
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `http://localhost:8080/api/usuarios/${id}` : 'http://localhost:8080/api/usuarios';
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                cerrarModal();
+                cargarUsuarios();
+            } else {
+                const text = await res.text();
+                alert('Error al guardar: ' + text);
+            }
+        } catch (error) {
+            console.error("Error", error);
+            alert("Error de conexión al servidor");
+        }
+    });
+
+    btnNuevoUsuario.addEventListener('click', () => abrirModal());
+    btnCerrarModal.addEventListener('click', cerrarModal);
+
+    // Inicializar
+    cargarRoles();
+    cargarUsuarios();
+});
