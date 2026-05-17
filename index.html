@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Bonito | Dashboard</title>
+    
+    <!-- Archivo CSS Principal -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Iconos (Boxicons) para un diseño más limpio -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- BARRA LATERAL (SIDEBAR) -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon">K</div>
+                <h2 class="logo-text">Kentakitos</h2>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">
+                        <i class='bx bx-grid-alt'></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class='bx bx-user'></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class='bx bx-folder'></i>
+                        <span>Proyectos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class='bx bx-bar-chart-alt-2'></i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: auto;">
+                    <a href="#" class="nav-link">
+                        <i class='bx bx-cog'></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- CABECERA -->
+            <header class="top-header">
+                <div class="page-title">
+                    <h1>Dashboard Principal</h1>
+                    <p>Bienvenido de nuevo, revisa el resumen de hoy.</p>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <i class='bx bx-search'></i>
+                        <input type="text" placeholder="Buscar en el sistema...">
+                    </div>
+                    <button class="profile-btn">
+                        <i class='bx bx-bell'></i>
+                    </button>
+                    <button class="profile-btn">
+                        <i class='bx bx-user'></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- TARJETAS DE ESTADÍSTICAS -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Usuarios Totales</h3>
+                        <h2>1,245</h2>
+                    </div>
+                    <div class="stat-icon icon-blue">
+                        <i class='bx bx-group'></i>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Ingresos Mensuales</h3>
+                        <h2>S/ 14,500</h2>
+                    </div>
+                    <div class="stat-icon icon-pink">
+                        <i class='bx bx-wallet'></i>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Nuevos Registros</h3>
+                        <h2>+86</h2>
+                    </div>
+                    <div class="stat-icon icon-purple">
+                        <i class='bx bx-trending-up'></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TABLA DE DATOS RECIENTES -->
+            <section class="table-container">
+                <div class="table-header">
+                    <h2>Actividad Reciente</h2>
+                    <button class="btn-primary">
+                        <i class='bx bx-plus'></i> Nuevo Registro
+                    </button>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Rol</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Carlos Mendoza</td>
+                            <td>Administrador</td>
+                            <td>16 May, 2026</td>
+                            <td><span class="status active">Activo</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-edit-alt'></i></button>
+                                <button class="action-btn"><i class='bx bx-trash'></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ana Lucía Rojas</td>
+                            <td>Desarrolladora</td>
+                            <td>15 May, 2026</td>
+                            <td><span class="status pending">En Revisión</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-edit-alt'></i></button>
+                                <button class="action-btn"><i class='bx bx-trash'></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Miguel Ángel Soto</td>
+                            <td>Diseñador UI</td>
+                            <td>12 May, 2026</td>
+                            <td><span class="status active">Activo</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-edit-alt'></i></button>
+                                <button class="action-btn"><i class='bx bx-trash'></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
