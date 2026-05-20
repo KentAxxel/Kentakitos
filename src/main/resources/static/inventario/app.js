@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = '/login.html';
+    const token = localStorage.getItem('jwtToken');
+    if (!usuarioString || !token) {
+        window.location.href = '/login-oauth.html';
         return;
     }
 
@@ -15,12 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarInventario() {
         try {
-            const res = await fetch('http://localhost:8080/api/inventario');
+            const res = await fetch('http://127.0.0.1:8080/api/inventario', {
+                method: 'GET',
+                headers: {
+                    // <-- ENVIAMOS EL TOKEN AQUÍ
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            
+            if (!res.ok) throw new Error('No autorizado o error del servidor');
+            
             inventarioGlobal = await res.json();
             renderTabla(inventarioGlobal);
         } catch (error) {
             console.error("Error", error);
-            tablaBody.innerHTML = '<tr><td colspan="5">Error de conexión con el servidor</td></tr>';
+            tablaBody.innerHTML = '<tr><td colspan="4">Error al cargar datos o sesión expirada</td></tr>';
         }
     }
 
@@ -86,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarItem(id) {
         if (!confirm('¿Seguro de eliminar este ingrediente del inventario?')) return;
         try {
-            const res = await fetch(`http://localhost:8080/api/inventario/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://127.0.0.1:8080/api/inventario/${id}`, { method: 'DELETE', headers:{'Authorization': `Bearer ${token}`} });
             if (res.ok) {
                 cargarInventario();
             } else {
@@ -104,12 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const payload = { ingrediente, cantidadDisponible: cantidad, unidadMedida: unidad };
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/inventario/${id}` : 'http://localhost:8080/api/inventario';
+        const url = id ? `http://127.0.0.1:8080/api/inventario/${id}` : 'http://127.0.0.1:8080/api/inventario';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 

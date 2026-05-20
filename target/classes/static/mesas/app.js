@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Verificar sesión y extraer token
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = '/login.html';
+    const jwtToken = localStorage.getItem('jwtToken');
+
+    if (!usuarioString || !jwtToken) {
+        window.location.href = '/login-oauth.html'; // Ajusta esto a login-oauth.html si es necesario
         return;
     }
 
@@ -13,9 +16,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let mesasGlobal = [];
 
+    // Función auxiliar para agregar JWT a los headers
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        };
+    }
+
+    // Manejar expiración de sesión
+    function handleUnauthorized() {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('usuario');
+        window.location.href = '/login-oauth.html';
+    }
+
     async function cargarMesas() {
         try {
-            const res = await fetch('http://localhost:8080/api/mesas');
+            // CORREGIDO: 128.0.0.1 -> 127.0.0.1 y se añadieron los headers
+            const res = await fetch('http://127.0.0.1:8080/api/mesas', {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+
             mesasGlobal = await res.json();
             renderTabla(mesasGlobal);
         } catch (error) {
@@ -87,7 +115,16 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarMesa(id) {
         if (!confirm('¿Seguro de eliminar esta mesa?')) return;
         try {
-            const res = await fetch(`http://localhost:8080/api/mesas/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://127.0.0.1:8080/api/mesas/${id}`, { 
+                method: 'DELETE',
+                headers: getAuthHeaders() // <-- Se añadieron los headers
+            });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+
             if (res.ok) {
                 cargarMesas();
             } else {
@@ -106,14 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/mesas/${id}` : 'http://localhost:8080/api/mesas';
+        const url = id ? `http://127.0.0.1:8080/api/mesas/${id}` : 'http://127.0.0.1:8080/api/mesas';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(), // <-- Se añadieron los headers
                 body: JSON.stringify(payload)
             });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
 
             if (res.ok) {
                 cerrarModal();

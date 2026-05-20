@@ -1,13 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = '/login.html';
+    const token = localStorage.getItem('jwtToken');
+    if (!usuarioString || !token) {
+        window.location.href = '/login-oauth.html';
         return;
     }
 
     async function cargarReportes() {
         try {
-            const res = await fetch('http://localhost:8080/api/reportes/dashboard');
+            const res = await fetch('http://127.0.0.1:8080/api/reportes/dashboard', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await res.json();
             
             document.getElementById('repUsuarios').innerText = data.totalUsuarios;

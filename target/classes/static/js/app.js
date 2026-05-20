@@ -1,20 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Verificar sesión
+    // 1. Verificar sesión con JWT token
+    const jwtToken = localStorage.getItem('jwtToken');
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = 'login.html';
+
+    if (!jwtToken || !usuarioString) {
+        window.location.href = 'login-oauth.html';
         return;
     }
+
     const usuarioLogueado = JSON.parse(usuarioString);
     console.log("Sesión iniciada como:", usuarioLogueado.username);
+
+    // Función auxiliar para agregar JWT a los headers
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        };
+    }
 
     // Logout
     const profileBtns = document.querySelectorAll('.profile-btn');
     if (profileBtns.length >= 2) {
         profileBtns[1].addEventListener('click', () => {
             if (confirm("¿Deseas cerrar sesión?")) {
+                localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');
-                window.location.href = 'login.html';
+                window.location.href = 'login-oauth.html';
             }
         });
     }
@@ -32,7 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar Roles para el select
     async function cargarRoles() {
         try {
-            const res = await fetch('http://localhost:8080/api/roles');
+            const res = await fetch('http://127.0.0.1:8080/api/roles', {
+                headers: getAuthHeaders()
+            });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+
             const roles = await res.json();
             selectRol.innerHTML = '';
             roles.forEach(rol => {
@@ -49,7 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Obtener y renderizar usuarios
     async function cargarUsuarios() {
         try {
-            const res = await fetch('http://localhost:8080/api/usuarios');
+            // CORREGIDO: Faltaba el '1' en la IP
+            const res = await fetch('http://127.0.0.1:8080/api/usuarios', {
+                headers: getAuthHeaders()
+            });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+
             usuariosGlobal = await res.json();
             renderTabla(usuariosGlobal);
         } catch (error) {
@@ -62,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaBody.innerHTML = '';
         usuarios.forEach(u => {
             const tr = document.createElement('tr');
-            
+
             const estadoClase = u.activo ? 'status active' : 'status pending';
             const estadoTexto = u.activo ? 'Activo' : 'Inactivo';
-            
+
             tr.innerHTML = `
                 <td>${u.nombreCompleto}</td>
                 <td>@${u.username}</td>
@@ -97,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function abrirModal(id = null) {
         document.getElementById('modalTitle').innerText = id ? 'Editar Usuario' : 'Nuevo Usuario';
-        
+
         if (id) {
             const u = usuariosGlobal.find(x => x.id === id);
             document.getElementById('userId').value = u.id;
@@ -115,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('userPassword').value = '';
             document.getElementById('userEstado').value = 'true';
         }
-        
+
         modal.style.display = 'flex';
     }
 
@@ -128,7 +157,16 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarUsuario(id) {
         if (!confirm('¿Estás seguro de eliminar este usuario permanentemente?')) return;
         try {
-            const res = await fetch(`http://localhost:8080/api/usuarios/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://127.0.0.1:8080/api/usuarios/${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+
             if (res.ok) {
                 cargarUsuarios();
             } else {
@@ -158,14 +196,19 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/usuarios/${id}` : 'http://localhost:8080/api/usuarios';
+        const url = id ? `http://127.0.0.1:8080/api/usuarios/${id}` : 'http://127.0.0.1:8080/api/usuarios';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
 
             if (res.ok) {
                 cerrarModal();
@@ -179,6 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error de conexión al servidor");
         }
     });
+
+    // Manejar errores de autenticación
+    function handleUnauthorized() {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('usuario');
+        window.location.href = 'login-oauth.html';
+    }
 
     btnNuevoUsuario.addEventListener('click', () => abrirModal());
     btnCerrarModal.addEventListener('click', cerrarModal);

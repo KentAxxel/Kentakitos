@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Verificar sesión
+    const token = localStorage.getItem('jwtToken');
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = '/login.html';
+    if (!usuarioString || !token) {
+        window.location.href = '/login-oauth.html';
         return;
     }
 
@@ -14,10 +15,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let permisosGlobal = [];
 
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+    }
+
+    // Manejar expiración de sesión
+    function handleUnauthorized() {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('permiso');
+        window.location.href = '/login-oauth.html';
+    }
+
     // Cargar Permisos
     async function cargarPermisos() {
         try {
-            const res = await fetch('http://localhost:8080/api/permisos');
+            const res = await fetch('http://127.0.0.1:8080/api/permisos', {
+                headers: getAuthHeaders()
+            });
             permisosGlobal = await res.json();
             renderTabla(permisosGlobal);
         } catch (error) {
@@ -80,7 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarPermiso(id) {
         if (!confirm('¿Seguro de eliminar este Permiso? (Fallará si un Rol ya lo tiene asignado)')) return;
         try {
-            const res = await fetch(`http://localhost:8080/api/permisos/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://127.0.0.1:8080/api/permisos/${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
             if (res.ok) {
                 cargarPermisos();
             } else {
@@ -97,12 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const payload = { nombre: nombre };
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/permisos/${id}` : 'http://localhost:8080/api/permisos';
+        const url = id ? `http://127.0.0.1:8080/api/permisos/${id}` : 'http://127.0.0.1:8080/api/permisos';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
 

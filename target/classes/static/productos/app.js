@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = '/login.html';
+    const token = localStorage.getItem('jwtToken');
+    if (!usuarioString || !token) {
+        window.location.href = '/login-oauth.html';
         return;
     }
 
@@ -15,7 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarProductos() {
         try {
-            const res = await fetch('http://localhost:8080/api/productos');
+            const res = await fetch('http://127.0.0.1:8080/api/productos', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             productosGlobal = await res.json();
             renderTabla(productosGlobal);
         } catch (error) {
@@ -82,7 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarProducto(id) {
         if (!confirm('¿Seguro de eliminar este producto del menú?')) return;
         try {
-            const res = await fetch(`http://localhost:8080/api/productos/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://127.0.0.1:8080/api/productos/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (res.ok) {
                 cargarProductos();
             } else {
@@ -101,12 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/productos/${id}` : 'http://localhost:8080/api/productos';
+        const url = id ? `http://127.0.0.1:8080/api/productos/${id}` : 'http://127.0.0.1:8080/api/productos';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 

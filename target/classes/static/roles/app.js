@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Verificar sesión
+    // 1. Verificar sesión y obtener el token
     const usuarioString = localStorage.getItem('usuario');
-    if (!usuarioString) {
-        window.location.href = '/login.html';
+    const token = localStorage.getItem('jwtToken'); // <-- Extraemos el token
+    
+    // Si no hay usuario o no hay token, lo mandamos al login
+    if (!usuarioString || !token) {
+        window.location.href = '/login-oauth.html';
         return;
     }
 
@@ -14,15 +17,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let rolesGlobal = [];
 
-    // Cargar Roles
+    // Cargar Roles (GET)
     async function cargarRoles() {
         try {
-            const res = await fetch('http://localhost:8080/api/roles');
+            const res = await fetch('http://127.0.0.1:8080/api/roles', {
+                method: 'GET',
+                headers: {
+                    // <-- ENVIAMOS EL TOKEN AQUÍ
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            
+            if (!res.ok) throw new Error('No autorizado o error del servidor');
+            
             rolesGlobal = await res.json();
             renderTabla(rolesGlobal);
         } catch (error) {
             console.error("Error", error);
-            tablaBody.innerHTML = '<tr><td colspan="4">Error de conexión con el servidor</td></tr>';
+            tablaBody.innerHTML = '<tr><td colspan="4">Error al cargar datos o sesión expirada</td></tr>';
         }
     }
 
@@ -83,18 +95,27 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
     }
 
+    // Eliminar Rol (DELETE)
     async function eliminarRol(id) {
         if (!confirm('¿Seguro de eliminar este Rol? (Asegúrate de que ningún usuario lo esté usando)')) return;
         try {
-            const res = await fetch(`http://localhost:8080/api/roles/${id}`, { method: 'DELETE' });
+            const res = await fetch(`http://127.0.0.1:8080/api/roles/${id}`, { 
+                method: 'DELETE',
+                headers: {
+                    // <-- ENVIAMOS EL TOKEN AQUÍ
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            
             if (res.ok) {
                 cargarRoles();
             } else {
-                alert('No se pudo eliminar el rol.');
+                alert('No se pudo eliminar el rol. Verifica permisos o dependencias.');
             }
         } catch(e) { console.error(e); }
     }
 
+    // Crear / Editar Rol (POST / PUT)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('rolId').value;
@@ -102,12 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const payload = { nombre: nombre };
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/roles/${id}` : 'http://localhost:8080/api/roles';
+        const url = id ? `http://127.0.0.1:8080/api/roles/${id}` : 'http://127.0.0.1:8080/api/roles';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // <-- ENVIAMOS EL TOKEN AQUÍ
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify(payload)
             });
 
