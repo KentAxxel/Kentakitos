@@ -44,6 +44,9 @@ public class Usuario {
     @Column(nullable = false, length = 20)
     private String proveedor = "LOCAL";
 
+    @Column(columnDefinition = "TEXT")
+    private String tokenActual;
+
     public Usuario() {
         this.activo = true;
         this.fechaCreacion = LocalDateTime.now();
@@ -148,5 +151,13 @@ public class Usuario {
 
     public void setProveedor(String proveedor) {
         this.proveedor = proveedor;
+    }
+
+    public String getTokenActual() {
+        return tokenActual;
+    }
+
+    public void setTokenActual(String tokenActual) {
+        this.tokenActual = tokenActual;
     }
 }

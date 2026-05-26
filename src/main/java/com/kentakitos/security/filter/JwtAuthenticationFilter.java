@@ -13,6 +13,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.kentakitos.security.repository.UsuarioRepository;
+import com.kentakitos.security.entity.Usuario;
+import java.util.Optional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +26,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -36,21 +42,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (jwtUtil.validateToken(token)) {
                     String username = jwtUtil.getUsernameFromToken(token);
-                    String rol = jwtUtil.getRolFromToken(token);
+                    
+                    // Verificar si el token coincide con el activo en BD
+                    Optional<Usuario> userOpt = usuarioRepository.findByUsername(username);
+                    if (userOpt.isPresent()) {
+                        Usuario u = userOpt.get();
+                        if (token.equals(u.getTokenActual())) {
+                            String rol = jwtUtil.getRolFromToken(token);
 
-                    Collection<GrantedAuthority> authorities = new ArrayList<>();
-                    if (rol != null && !rol.isEmpty()) {
-                        authorities.add(new SimpleGrantedAuthority(rol));
+                            Collection<GrantedAuthority> authorities = new ArrayList<>();
+                            if (rol != null && !rol.isEmpty()) {
+                                authorities.add(new SimpleGrantedAuthority(rol));
+                            }
+
+                            UsernamePasswordAuthenticationToken authentication =
+                                    new UsernamePasswordAuthenticationToken(
+                                            username,
+                                            null,
+                                            authorities
+                                    );
+                            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                        } else {
+                            logger.warn("Token rechazado por sesión inválida/reemplazada para " + username);
+                        }
                     }
-
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    username,
-                                    null,
-                                    authorities
-                            );
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception e) {

@@ -45,7 +45,23 @@ public class GoogleOAuth2Service {
                 usuario = createGoogleUser(tokenInfo);
             }
 
+            // CONTROL DE SESIÓN ÚNICA
+            if (usuario.getTokenActual() != null && !usuario.getTokenActual().trim().isEmpty()) {
+                try {
+                    if (jwtUtil.validateToken(usuario.getTokenActual())) {
+                        throw new RuntimeException("Ya existe una sesión activa en otro navegador. Cierra sesión primero.");
+                    }
+                } catch (Exception e) {
+                    // Token viejo expirado, ignorar
+                }
+            }
+
             String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getRol().getNombre());
+            
+            // Guardar el token actual
+            usuario.setTokenActual(token);
+            usuarioRepository.save(usuario);
+            
             return AuthServiceUtil.buildLoginResponse(usuario, token);
 
         } catch (Exception e) {

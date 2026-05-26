@@ -22,8 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logout
     const profileBtns = document.querySelectorAll('.profile-btn');
     if (profileBtns.length >= 2) {
-        profileBtns[1].addEventListener('click', () => {
+        profileBtns[1].addEventListener('click', async () => {
             if (confirm("¿Deseas cerrar sesión?")) {
+                try {
+                    await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                        method: 'POST',
+                        headers: getAuthHeaders()
+                    });
+                } catch(e) { console.error("Error al cerrar sesión", e); }
+                
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');
                 window.location.href = 'login-oauth.html';

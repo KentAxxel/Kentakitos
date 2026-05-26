@@ -96,6 +96,9 @@ function showLoading(show) {
 }
 
 function showError(message) {
+    if (message.includes("Ya existe una sesión activa")) {
+        alert(message);
+    }
     errorMessage.textContent = message;
     errorMessage.style.display = 'block';
 }

@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.kentakitos.security.repository.UsuarioRepository;
+import com.kentakitos.security.entity.Usuario;
+import com.kentakitos.security.util.JwtUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +27,12 @@ public class AuthController {
 
     @Autowired
     private GoogleOAuth2Service googleOAuth2Service;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -51,7 +60,23 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<?> logout(@RequestHeader(value="Authorization", required=false) String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                String username = jwtUtil.getUsernameFromToken(token);
+                java.util.Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
+                if (usuarioOpt.isPresent()) {
+                    Usuario usuario = usuarioOpt.get();
+                    if (token.equals(usuario.getTokenActual())) {
+                        usuario.setTokenActual(null);
+                        usuarioRepository.save(usuario);
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore parsing errors on logout
+            }
+        }
         return ResponseEntity.ok("{\"status\": \"logged_out\"}");
     }
 

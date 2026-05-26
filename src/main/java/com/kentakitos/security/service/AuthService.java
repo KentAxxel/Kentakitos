@@ -41,7 +41,23 @@ public class AuthService {
             throw new RuntimeException("Usuario inactivo");
         }
 
+        // CONTROL DE SESIÓN ÚNICA
+        if (usuario.getTokenActual() != null && !usuario.getTokenActual().trim().isEmpty()) {
+            try {
+                if (jwtUtil.validateToken(usuario.getTokenActual())) {
+                    throw new RuntimeException("Ya existe una sesión activa en otro navegador. Cierra sesión primero.");
+                }
+            } catch (Exception e) {
+                // Si el token es inválido/expirado, continuamos normalmente y lo pisaremos
+            }
+        }
+
         String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getRol().getNombre());
+        
+        // Guardar el nuevo token en la BD
+        usuario.setTokenActual(token);
+        usuarioRepository.save(usuario);
+        
         return AuthServiceUtil.buildLoginResponse(usuario, token);
     }
 }
