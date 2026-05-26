@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,9 @@ public class UsuarioController {
 
     @Autowired
     private RolRepository rolRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<Usuario> listarUsuarios() {
@@ -40,6 +45,12 @@ public class UsuarioController {
         }
         
         usuario.setRol(rolOpt.get());
+        
+        // Encriptar la contraseña antes de guardar
+        if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+        
         Usuario nuevoUsuario = usuarioRepository.save(usuario);
         return ResponseEntity.ok(nuevoUsuario);
     }
@@ -57,7 +68,7 @@ public class UsuarioController {
         
         // Si se envió una nueva contraseña (y no está vacía)
         if(usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().trim().isEmpty()){
-            usuarioExistente.setPassword(usuarioActualizado.getPassword());
+            usuarioExistente.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
         }
 
         Optional<Rol> rolOpt = rolRepository.findById(usuarioActualizado.getRol().getId());

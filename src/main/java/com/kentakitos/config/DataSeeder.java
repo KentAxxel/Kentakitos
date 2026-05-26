@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +26,9 @@ public class DataSeeder implements CommandLineRunner {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -43,9 +48,8 @@ public class DataSeeder implements CommandLineRunner {
         if (usuarioRepository.findByUsername("admin").isEmpty()) {
             Usuario admin = new Usuario();
             admin.setUsername("admin");
-            // NOTA: Para un sistema real, la contraseña DEBE estar encriptada (Ej: BCrypt). 
-            // Por simplicidad en esta primera versión, la guardamos en texto plano.
-            admin.setPassword("admin123");
+            // Contraseña encriptada con SHA-256
+            admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setNombreCompleto("Administrador del Sistema");
             admin.setRol(rolAdmin);
             admin.setActivo(true);

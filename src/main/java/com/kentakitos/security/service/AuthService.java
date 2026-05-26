@@ -31,9 +31,7 @@ public class AuthService {
 
         Usuario usuario = usuarioOpt.get();
 
-        boolean passwordMatches = usuario.getPassword().startsWith("$2a$") || usuario.getPassword().startsWith("$2b$")
-                ? passwordEncoder.matches(password, usuario.getPassword())
-                : usuario.getPassword().equals(password);
+        boolean passwordMatches = passwordEncoder.matches(password, usuario.getPassword());
 
         if (!passwordMatches) {
             throw new RuntimeException("Contraseña incorrecta");
