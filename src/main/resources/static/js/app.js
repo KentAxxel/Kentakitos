@@ -19,10 +19,29 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Logout
-    const profileBtns = document.querySelectorAll('.profile-btn');
-    if (profileBtns.length >= 2) {
-        profileBtns[1].addEventListener('click', async () => {
+    // Dropdown Profile logic
+    const btnProfileDropdown = document.getElementById('btnProfileDropdown');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const headerUsername = document.getElementById('headerUsername');
+    
+    if (headerUsername && usuarioLogueado) {
+        headerUsername.textContent = usuarioLogueado.nombreCompleto || usuarioLogueado.username;
+    }
+
+    if (btnProfileDropdown && profileDropdown) {
+        btnProfileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
+        });
+    }
+
+    const btnLogoutAction = document.getElementById('btnLogoutAction');
+    if (btnLogoutAction) {
+        btnLogoutAction.addEventListener('click', async (e) => {
+            e.preventDefault();
             if (confirm("¿Deseas cerrar sesión?")) {
                 try {
                     await fetch('http://127.0.0.1:8080/api/auth/logout', {
@@ -33,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');
-                window.location.href = 'login-oauth.html';
+                window.location.href = '/login-oauth.html';
             }
         });
     }

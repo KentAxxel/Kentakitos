@@ -83,9 +83,19 @@
                 </div>
                 
                 <div class="header-actions">
-                    <button class="profile-btn" id="btnLogout">
-                        <i class='bx bx-log-out'></i>
+                    <button class="profile-btn">
+                        <i class='bx bx-bell'></i>
                     </button>
+                    
+                    <div class="profile-menu">
+                        <button class="profile-btn" id="btnProfileDropdown">
+                            <span id="headerUsername" class="header-username">Usuario</span>
+                            <i class='bx bx-user'></i>
+                        </button>
+                        <div class="dropdown-content" id="profileDropdown">
+                            <a href="#" id="btnLogoutAction"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
                 </div>
             </header>
 

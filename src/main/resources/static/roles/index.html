@@ -51,6 +51,22 @@
                     <h1>Gestión de Roles</h1>
                     <p>Administra los roles del sistema y sus permisos.</p>
                 </div>
+                            
+                <div class="header-actions">
+                    <button class="profile-btn">
+                        <i class='bx bx-bell'></i>
+                    </button>
+                    
+                    <div class="profile-menu">
+                        <button class="profile-btn" id="btnProfileDropdown">
+                            <span id="headerUsername" class="header-username">Usuario</span>
+                            <i class='bx bx-user'></i>
+                        </button>
+                        <div class="dropdown-content" id="profileDropdown">
+                            <a href="#" id="btnLogoutAction"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <section class="table-container">
@@ -87,6 +103,13 @@
                 <div class="form-group">
                     <label>Nombre del Rol (Ej: ROLE_CAJERO)</label>
                     <input type="text" id="rolNombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Permisos Asignados</label>
+                    <div id="permisosCheckboxes" class="checkbox-group">
+                        <!-- Generado por JS -->
+                    </div>
                 </div>
                 
                 <div class="modal-actions">

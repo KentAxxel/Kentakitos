@@ -1,34 +1,6 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const usuarioString = localStorage.getItem('usuario');
-    const token = localStorage.getItem('jwtToken');
-    if (!usuarioString || !token) {
-        window.location.href = '/login-oauth.html';
-        return;
-    }
+$jsFiles = Get-ChildItem -Path d:\xdddddddddddd\Kentakitos-1\src\main\resources\static -Recurse -Include app.js | Where-Object { $_.FullName -notmatch '\\js\\app\.js$' }
 
-    async function cargarReportes() {
-        try {
-            const res = await fetch('http://127.0.0.1:8080/api/reportes/dashboard', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
-            
-            document.getElementById('repUsuarios').innerText = data.totalUsuarios;
-            document.getElementById('repMesas').innerText = data.totalMesas;
-            document.getElementById('repProductos').innerText = data.totalProductos;
-            document.getElementById('repIngredientes').innerText = data.totalIngredientes;
-            
-        } catch (error) {
-            console.error("Error al cargar reportes", error);
-        }
-    }
-
-    cargarReportes();
-});
-
+$dropdownCode = @"
 document.addEventListener('DOMContentLoaded', () => {
     // Dropdown Profile logic
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
@@ -57,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLogoutAction) {
         btnLogoutAction.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (confirm("Â¿Deseas cerrar sesiÃ³n?")) {
+            if (confirm("¿Deseas cerrar sesión?")) {
                 const tk = localStorage.getItem('jwtToken');
                 if (tk) {
                     try {
@@ -74,3 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+"@
+
+foreach ($file in $jsFiles) {
+    # Evitar duplicados
+    $content = [System.IO.File]::ReadAllText($file.FullName)
+    if (-not $content.Contains('btnProfileDropdown')) {
+        $content += "`r`n" + $dropdownCode
+        [System.IO.File]::WriteAllText($file.FullName, $content)
+    }
+}
+Write-Output "JS updated"

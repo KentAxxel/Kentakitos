@@ -16,6 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('rolForm');
 
     let rolesGlobal = [];
+    let permisosGlobal = [];
+
+    // Cargar Permisos (GET)
+    async function cargarPermisos() {
+        try {
+            const res = await fetch('http://127.0.0.1:8080/api/permisos', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                permisosGlobal = await res.json();
+            }
+        } catch (error) { console.error("Error al cargar permisos", error); }
+    }
 
     // Cargar Roles (GET)
     async function cargarRoles() {
@@ -82,12 +96,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const r = rolesGlobal.find(x => x.id === id);
             document.getElementById('rolId').value = r.id;
             document.getElementById('rolNombre').value = r.nombre;
+            renderCheckboxes(r.permisos || []);
         } else {
             document.getElementById('rolId').value = '';
             document.getElementById('rolNombre').value = 'ROLE_';
+            renderCheckboxes([]);
         }
         
         modal.style.display = 'flex';
+    }
+
+    function renderCheckboxes(permisosAsignados) {
+        const container = document.getElementById('permisosCheckboxes');
+        container.innerHTML = '';
+        const asignadosIds = permisosAsignados.map(p => p.id);
+        
+        permisosGlobal.forEach(p => {
+            const isChecked = asignadosIds.includes(p.id) ? 'checked' : '';
+            const div = document.createElement('div');
+            div.className = 'checkbox-item';
+            div.innerHTML = `
+                <input type="checkbox" id="permiso_${p.id}" value="${p.id}" ${isChecked}>
+                <label for="permiso_${p.id}">${p.nombre}</label>
+            `;
+            container.appendChild(div);
+        });
     }
 
     function cerrarModal() {
@@ -121,7 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = document.getElementById('rolId').value;
         const nombre = document.getElementById('rolNombre').value;
 
-        const payload = { nombre: nombre };
+        // Recolectar permisos seleccionados
+        const checkboxes = document.querySelectorAll('#permisosCheckboxes input[type="checkbox"]:checked');
+        const permisosSeleccionados = Array.from(checkboxes).map(cb => {
+            return { id: parseInt(cb.value) };
+        });
+
+        const payload = { 
+            nombre: nombre,
+            permisos: permisosSeleccionados
+        };
         const method = id ? 'PUT' : 'POST';
         const url = id ? `http://127.0.0.1:8080/api/roles/${id}` : 'http://127.0.0.1:8080/api/roles';
 
@@ -151,5 +193,50 @@ document.addEventListener('DOMContentLoaded', () => {
     btnNuevoRol.addEventListener('click', () => abrirModal());
     btnCerrarModal.addEventListener('click', cerrarModal);
 
-    cargarRoles();
+    cargarPermisos().then(() => cargarRoles());
+});
+document.addEventListener('DOMContentLoaded', () => {
+    // Dropdown Profile logic
+    const btnProfileDropdown = document.getElementById('btnProfileDropdown');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const headerUsername = document.getElementById('headerUsername');
+    
+    const usStr = localStorage.getItem('usuario');
+    if (usStr && headerUsername) {
+        try {
+            const us = JSON.parse(usStr);
+            headerUsername.textContent = us.nombreCompleto || us.username;
+        } catch(e) {}
+    }
+
+    if (btnProfileDropdown && profileDropdown) {
+        btnProfileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
+        });
+    }
+
+    const btnLogoutAction = document.getElementById('btnLogoutAction');
+    if (btnLogoutAction) {
+        btnLogoutAction.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (confirm("¿Deseas cerrar sesión?")) {
+                const tk = localStorage.getItem('jwtToken');
+                if (tk) {
+                    try {
+                        await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + tk }
+                        });
+                    } catch(e) {}
+                }
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('usuario');
+                window.location.href = '/login-oauth.html';
+            }
+        });
+    }
 });
