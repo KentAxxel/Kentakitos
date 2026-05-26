@@ -43,12 +43,8 @@ public class AuthService {
 
         // CONTROL DE SESIÓN ÚNICA
         if (usuario.getTokenActual() != null && !usuario.getTokenActual().trim().isEmpty()) {
-            try {
-                if (jwtUtil.validateToken(usuario.getTokenActual())) {
-                    throw new RuntimeException("Ya existe una sesión activa en otro navegador. Cierra sesión primero.");
-                }
-            } catch (Exception e) {
-                // Si el token es inválido/expirado, continuamos normalmente y lo pisaremos
+            if (jwtUtil.validateToken(usuario.getTokenActual())) {
+                throw new RuntimeException("Ya existe una sesión activa en otro navegador. Cierra sesión primero.");
             }
         }
 

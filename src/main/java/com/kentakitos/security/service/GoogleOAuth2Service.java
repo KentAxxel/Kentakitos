@@ -47,12 +47,8 @@ public class GoogleOAuth2Service {
 
             // CONTROL DE SESIÓN ÚNICA
             if (usuario.getTokenActual() != null && !usuario.getTokenActual().trim().isEmpty()) {
-                try {
-                    if (jwtUtil.validateToken(usuario.getTokenActual())) {
-                        throw new RuntimeException("Ya existe una sesión activa en otro navegador. Cierra sesión primero.");
-                    }
-                } catch (Exception e) {
-                    // Token viejo expirado, ignorar
+                if (jwtUtil.validateToken(usuario.getTokenActual())) {
+                    throw new RuntimeException("Ya existe una sesión activa en otro navegador. Cierra sesión primero.");
                 }
             }
 
