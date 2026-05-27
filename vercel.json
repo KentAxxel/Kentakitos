@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/login", "destination": "/login-oauth.html" },
+    { "source": "/usuarios", "destination": "/usuarios/index.html" },
+    { "source": "/productos", "destination": "/productos/index.html" },
+    { "source": "/inventario", "destination": "/inventario/index.html" },
+    { "source": "/mesas", "destination": "/mesas/index.html" }
+  ]
+}
