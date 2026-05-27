@@ -4,17 +4,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
+
             const btnLogin = document.querySelector('.btn-login');
             btnLogin.innerHTML = 'Cargando...';
             btnLogin.disabled = true;
 
             try {
                 // LLAMADA AL BACKEND REAL
-                const response = await fetch('http://127.0.0.1:8080/api/auth/login', {
+                const response = await fetch('https://kentakitos-production.up.railway.app/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     const usuario = await response.json();
-                    
+
                     // Guardamos la sesión real en el navegador
                     localStorage.setItem('usuario', JSON.stringify({
                         id: usuario.id,
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         nombreCompleto: usuario.nombreCompleto,
                         rol: usuario.rol.nombre
                     }));
-                    
+
                     window.location.href = 'index.html';
                 } else {
                     const errorMsg = await response.text();

@@ -16,16 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarInventario() {
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/inventario', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/inventario', {
                 method: 'GET',
                 headers: {
                     // <-- ENVIAMOS EL TOKEN AQUÍ
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             if (!res.ok) throw new Error('No autorizado o error del servidor');
-            
+
             inventarioGlobal = await res.json();
             renderTabla(inventarioGlobal);
         } catch (error) {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaBody.innerHTML = '';
         inventario.forEach(item => {
             const tr = document.createElement('tr');
-            
+
             // Estilo visual de advertencia si queda poco stock (ej < 5)
             const estiloAlerta = item.cantidadDisponible < 5 ? 'color: red; font-weight: bold;' : '';
 
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function abrirModal(id = null) {
         document.getElementById('modalTitle').innerText = id ? 'Editar Ingrediente' : 'Nuevo Ingrediente';
-        
+
         if (id) {
             const item = inventarioGlobal.find(x => x.id === id);
             document.getElementById('itemId').value = item.id;
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('itemCantidad').value = '0';
             document.getElementById('itemUnidad').value = 'KG';
         }
-        
+
         modal.style.display = 'flex';
     }
 
@@ -96,13 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarItem(id) {
         if (!confirm('¿Seguro de eliminar este ingrediente del inventario?')) return;
         try {
-            const res = await fetch(`http://127.0.0.1:8080/api/inventario/${id}`, { method: 'DELETE', headers:{'Authorization': `Bearer ${token}`} });
+            const res = await fetch(`https://kentakitos-production.up.railway.app/api/inventario/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) {
                 cargarInventario();
             } else {
                 alert('No se pudo eliminar.');
             }
-        } catch(e) { console.error(e); }
+        } catch (e) { console.error(e); }
     }
 
     form.addEventListener('submit', async (e) => {
@@ -114,12 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const payload = { ingrediente, cantidadDisponible: cantidad, unidadMedida: unidad };
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://127.0.0.1:8080/api/inventario/${id}` : 'http://127.0.0.1:8080/api/inventario';
+        const url = id ? `https://kentakitos-production.up.railway.app/api/inventario/${id}` : 'https://kentakitos-production.up.railway.app/api/inventario';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
@@ -149,13 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
     const profileDropdown = document.getElementById('profileDropdown');
     const headerUsername = document.getElementById('headerUsername');
-    
+
     const usStr = localStorage.getItem('usuario');
     if (usStr && headerUsername) {
         try {
             const us = JSON.parse(usStr);
             headerUsername.textContent = us.nombreCompleto || us.username;
-        } catch(e) {}
+        } catch (e) { }
     }
 
     if (btnProfileDropdown && profileDropdown) {
@@ -176,11 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tk = localStorage.getItem('jwtToken');
                 if (tk) {
                     try {
-                        await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                        await fetch('https://kentakitos-production.up.railway.app/api/auth/logout', {
                             method: 'POST',
                             headers: { 'Authorization': 'Bearer ' + tk }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 }
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');

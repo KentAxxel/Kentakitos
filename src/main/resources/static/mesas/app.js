@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarMesas() {
         try {
             // CORREGIDO: 128.0.0.1 -> 127.0.0.1 y se añadieron los headers
-            const res = await fetch('http://127.0.0.1:8080/api/mesas', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/mesas', {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaBody.innerHTML = '';
         mesas.forEach(m => {
             const tr = document.createElement('tr');
-            
+
             let estadoClase = 'status';
             if (m.estado === 'DISPONIBLE') estadoClase += ' active'; // verde
             else if (m.estado === 'OCUPADA') estadoClase += ' pending'; // amarillo
             else estadoClase += ''; // gris o default
-            
+
             tr.innerHTML = `
                 <td><strong>Mesa ${m.numero}</strong></td>
                 <td>${m.capacidad}</td>
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function abrirModal(id = null) {
         document.getElementById('modalTitle').innerText = id ? 'Editar Mesa' : 'Nueva Mesa';
-        
+
         if (id) {
             const m = mesasGlobal.find(x => x.id === id);
             document.getElementById('mesaId').value = m.id;
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mesaCapacidad').value = '4';
             document.getElementById('mesaEstado').value = 'DISPONIBLE';
         }
-        
+
         modal.style.display = 'flex';
     }
 
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarMesa(id) {
         if (!confirm('¿Seguro de eliminar esta mesa?')) return;
         try {
-            const res = await fetch(`http://127.0.0.1:8080/api/mesas/${id}`, { 
+            const res = await fetch(`https://kentakitos-production.up.railway.app/api/mesas/${id}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders() // <-- Se añadieron los headers
             });
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 alert('No se pudo eliminar.');
             }
-        } catch(e) { console.error(e); }
+        } catch (e) { console.error(e); }
     }
 
     form.addEventListener('submit', async (e) => {
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://127.0.0.1:8080/api/mesas/${id}` : 'http://127.0.0.1:8080/api/mesas';
+        const url = id ? `https://kentakitos-production.up.railway.app/api/mesas/${id}` : 'https://kentakitos-production.up.railway.app/api/mesas';
 
         try {
             const res = await fetch(url, {
@@ -179,13 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
     const profileDropdown = document.getElementById('profileDropdown');
     const headerUsername = document.getElementById('headerUsername');
-    
+
     const usStr = localStorage.getItem('usuario');
     if (usStr && headerUsername) {
         try {
             const us = JSON.parse(usStr);
             headerUsername.textContent = us.nombreCompleto || us.username;
-        } catch(e) {}
+        } catch (e) { }
     }
 
     if (btnProfileDropdown && profileDropdown) {
@@ -206,11 +206,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tk = localStorage.getItem('jwtToken');
                 if (tk) {
                     try {
-                        await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                        await fetch('https://kentakitos-production.up.railway.app/api/auth/logout', {
                             method: 'POST',
                             headers: { 'Authorization': 'Bearer ' + tk }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 }
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');

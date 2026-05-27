@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Verificar sesión y obtener el token
     const usuarioString = localStorage.getItem('usuario');
     const token = localStorage.getItem('jwtToken'); // <-- Extraemos el token
-    
+
     // Si no hay usuario o no hay token, lo mandamos al login
     if (!usuarioString || !token) {
         window.location.href = '/login-oauth.html';
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar Permisos (GET)
     async function cargarPermisos() {
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/permisos', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/permisos', {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -34,16 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar Roles (GET)
     async function cargarRoles() {
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/roles', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/roles', {
                 method: 'GET',
                 headers: {
                     // <-- ENVIAMOS EL TOKEN AQUÍ
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             if (!res.ok) throw new Error('No autorizado o error del servidor');
-            
+
             rolesGlobal = await res.json();
             renderTabla(rolesGlobal);
         } catch (error) {
@@ -56,10 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaBody.innerHTML = '';
         roles.forEach(r => {
             const tr = document.createElement('tr');
-            
+
             // Extraer nombres de permisos
-            const permisosNombres = r.permisos && r.permisos.length > 0 
-                ? r.permisos.map(p => p.nombre).join(', ') 
+            const permisosNombres = r.permisos && r.permisos.length > 0
+                ? r.permisos.map(p => p.nombre).join(', ')
                 : 'Ninguno';
 
             tr.innerHTML = `
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function abrirModal(id = null) {
         document.getElementById('modalTitle').innerText = id ? 'Editar Rol' : 'Nuevo Rol';
-        
+
         if (id) {
             const r = rolesGlobal.find(x => x.id === id);
             document.getElementById('rolId').value = r.id;
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('rolNombre').value = 'ROLE_';
             renderCheckboxes([]);
         }
-        
+
         modal.style.display = 'flex';
     }
 
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('permisosCheckboxes');
         container.innerHTML = '';
         const asignadosIds = permisosAsignados.map(p => p.id);
-        
+
         permisosGlobal.forEach(p => {
             const isChecked = asignadosIds.includes(p.id) ? 'checked' : '';
             const div = document.createElement('div');
@@ -132,20 +132,20 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarRol(id) {
         if (!confirm('¿Seguro de eliminar este Rol? (Asegúrate de que ningún usuario lo esté usando)')) return;
         try {
-            const res = await fetch(`http://127.0.0.1:8080/api/roles/${id}`, { 
+            const res = await fetch(`https://kentakitos-production.up.railway.app/api/roles/${id}`, {
                 method: 'DELETE',
                 headers: {
                     // <-- ENVIAMOS EL TOKEN AQUÍ
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             if (res.ok) {
                 cargarRoles();
             } else {
                 alert('No se pudo eliminar el rol. Verifica permisos o dependencias.');
             }
-        } catch(e) { console.error(e); }
+        } catch (e) { console.error(e); }
     }
 
     // Crear / Editar Rol (POST / PUT)
@@ -160,20 +160,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return { id: parseInt(cb.value) };
         });
 
-        const payload = { 
+        const payload = {
             nombre: nombre,
             permisos: permisosSeleccionados
         };
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://127.0.0.1:8080/api/roles/${id}` : 'http://127.0.0.1:8080/api/roles';
+        const url = id ? `https://kentakitos-production.up.railway.app/api/roles/${id}` : 'https://kentakitos-production.up.railway.app/api/roles';
 
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     // <-- ENVIAMOS EL TOKEN AQUÍ
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -200,13 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
     const profileDropdown = document.getElementById('profileDropdown');
     const headerUsername = document.getElementById('headerUsername');
-    
+
     const usStr = localStorage.getItem('usuario');
     if (usStr && headerUsername) {
         try {
             const us = JSON.parse(usStr);
             headerUsername.textContent = us.nombreCompleto || us.username;
-        } catch(e) {}
+        } catch (e) { }
     }
 
     if (btnProfileDropdown && profileDropdown) {
@@ -227,11 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tk = localStorage.getItem('jwtToken');
                 if (tk) {
                     try {
-                        await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                        await fetch('https://kentakitos-production.up.railway.app/api/auth/logout', {
                             method: 'POST',
                             headers: { 'Authorization': 'Bearer ' + tk }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 }
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');

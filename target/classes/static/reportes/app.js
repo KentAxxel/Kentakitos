@@ -8,19 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarReportes() {
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/reportes/dashboard', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/reportes/dashboard', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             const data = await res.json();
-            
+
             document.getElementById('repUsuarios').innerText = data.totalUsuarios;
             document.getElementById('repMesas').innerText = data.totalMesas;
             document.getElementById('repProductos').innerText = data.totalProductos;
             document.getElementById('repIngredientes').innerText = data.totalIngredientes;
-            
+
         } catch (error) {
             console.error("Error al cargar reportes", error);
         }
@@ -34,13 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
     const profileDropdown = document.getElementById('profileDropdown');
     const headerUsername = document.getElementById('headerUsername');
-    
+
     const usStr = localStorage.getItem('usuario');
     if (usStr && headerUsername) {
         try {
             const us = JSON.parse(usStr);
             headerUsername.textContent = us.nombreCompleto || us.username;
-        } catch(e) {}
+        } catch (e) { }
     }
 
     if (btnProfileDropdown && profileDropdown) {
@@ -61,11 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tk = localStorage.getItem('jwtToken');
                 if (tk) {
                     try {
-                        await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                        await fetch('https://kentakitos-production.up.railway.app/api/auth/logout', {
                             method: 'POST',
                             headers: { 'Authorization': 'Bearer ' + tk }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 }
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');

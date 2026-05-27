@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarProductos() {
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/productos', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/productos', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaBody.innerHTML = '';
         productos.forEach(p => {
             const tr = document.createElement('tr');
-            
+
             tr.innerHTML = `
                 <td><span class="status">${p.categoria}</span></td>
                 <td><strong>${p.nombre}</strong></td>
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function abrirModal(id = null) {
         document.getElementById('modalTitle').innerText = id ? 'Editar Producto' : 'Nuevo Producto';
-        
+
         if (id) {
             const p = productosGlobal.find(x => x.id === id);
             document.getElementById('productoId').value = p.id;
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('productoNombre').value = '';
             document.getElementById('productoPrecio').value = '0.00';
         }
-        
+
         modal.style.display = 'flex';
     }
 
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarProducto(id) {
         if (!confirm('¿Seguro de eliminar este producto del menú?')) return;
         try {
-            const res = await fetch(`http://127.0.0.1:8080/api/productos/${id}`, {
+            const res = await fetch(`https://kentakitos-production.up.railway.app/api/productos/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 alert('No se pudo eliminar.');
             }
-        } catch(e) { console.error(e); }
+        } catch (e) { console.error(e); }
     }
 
     form.addEventListener('submit', async (e) => {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://127.0.0.1:8080/api/productos/${id}` : 'http://127.0.0.1:8080/api/productos';
+        const url = id ? `https://kentakitos-production.up.railway.app/api/productos/${id}` : 'https://kentakitos-production.up.railway.app/api/productos';
 
         try {
             const res = await fetch(url, {
@@ -147,13 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
     const profileDropdown = document.getElementById('profileDropdown');
     const headerUsername = document.getElementById('headerUsername');
-    
+
     const usStr = localStorage.getItem('usuario');
     if (usStr && headerUsername) {
         try {
             const us = JSON.parse(usStr);
             headerUsername.textContent = us.nombreCompleto || us.username;
-        } catch(e) {}
+        } catch (e) { }
     }
 
     if (btnProfileDropdown && profileDropdown) {
@@ -174,11 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tk = localStorage.getItem('jwtToken');
                 if (tk) {
                     try {
-                        await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                        await fetch('https://kentakitos-production.up.railway.app/api/auth/logout', {
                             method: 'POST',
                             headers: { 'Authorization': 'Bearer ' + tk }
                         });
-                    } catch(e) {}
+                    } catch (e) { }
                 }
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');

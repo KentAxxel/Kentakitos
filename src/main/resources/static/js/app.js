@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProfileDropdown = document.getElementById('btnProfileDropdown');
     const profileDropdown = document.getElementById('profileDropdown');
     const headerUsername = document.getElementById('headerUsername');
-    
+
     if (headerUsername && usuarioLogueado) {
         headerUsername.textContent = usuarioLogueado.nombreCompleto || usuarioLogueado.username;
     }
@@ -44,12 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (confirm("¿Deseas cerrar sesión?")) {
                 try {
-                    await fetch('http://127.0.0.1:8080/api/auth/logout', {
+                    await fetch('https://kentakitos-production.up.railway.app/api/auth/logout', {
                         method: 'POST',
                         headers: getAuthHeaders()
                     });
-                } catch(e) { console.error("Error al cerrar sesión", e); }
-                
+                } catch (e) { console.error("Error al cerrar sesión", e); }
+
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('usuario');
                 window.location.href = '/login-oauth.html';
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar Roles para el select
     async function cargarRoles() {
         try {
-            const res = await fetch('http://127.0.0.1:8080/api/roles', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/roles', {
                 headers: getAuthHeaders()
             });
 
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarUsuarios() {
         try {
             // CORREGIDO: Faltaba el '1' en la IP
-            const res = await fetch('http://127.0.0.1:8080/api/usuarios', {
+            const res = await fetch('https://kentakitos-production.up.railway.app/api/usuarios', {
                 headers: getAuthHeaders()
             });
 
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarUsuario(id) {
         if (!confirm('¿Estás seguro de eliminar este usuario permanentemente?')) return;
         try {
-            const res = await fetch(`http://127.0.0.1:8080/api/usuarios/${id}`, {
+            const res = await fetch(`https://kentakitos-production.up.railway.app/api/usuarios/${id}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 alert('No se pudo eliminar');
             }
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     }
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://127.0.0.1:8080/api/usuarios/${id}` : 'http://127.0.0.1:8080/api/usuarios';
+        const url = id ? `https://kentakitos-production.up.railway.app/api/usuarios/${id}` : 'https://kentakitos-production.up.railway.app/api/usuarios';
 
         try {
             const res = await fetch(url, {
