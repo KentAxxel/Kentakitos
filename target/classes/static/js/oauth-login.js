@@ -17,7 +17,7 @@ async function loginTraditional(username, password) {
     clearMessages();
 
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('https://kentakitos-production.up.railway.app/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -133,8 +133,8 @@ window.addEventListener('load', () => {
         // 2. Renderizar automáticamente el botón oficial en nuestro DIV
         google.accounts.id.renderButton(
             document.getElementById('googleBtn'),
-            { 
-                theme: 'outline', 
+            {
+                theme: 'outline',
                 size: 'large',
                 width: 320 // Ajusta este ancho para que se acople bien a tu contenedor Kentakitos
             }
