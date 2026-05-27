@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    { "source": "/", "destination": "/index.html" },
     { "source": "/login", "destination": "/login-oauth.html" },
     { "source": "/usuarios", "destination": "/usuarios/index.html" },
     { "source": "/productos", "destination": "/productos/index.html" },
